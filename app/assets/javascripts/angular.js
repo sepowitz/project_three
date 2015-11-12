@@ -41,6 +41,47 @@ app.controller('ItemController', ['$http', '$scope', function($http, $scope){
 	var itemCtrl = this;
 	var authenticity_token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 
+	itemCtrl.editFormStatus = null;
+
+itemCtrl.showEditForm = function(itemId){
+	itemCtrl.editFormStatus = itemId;
+};
+
+itemCtrl.editItem = function(item){
+	for(var i=0; i < itemCtrl.itemList.length; i ++){
+		if(itemCtrl.itemList[i].id === item.id){
+			itemCtrl.itemList[i].title = item.title;
+			itemCtrl.itemList[i].description = item.description;
+		}
+	};
+
+	$http.patch('/posts/' + item.id, {
+		authenticity_token: authenticity_token,
+		post: {
+			title: item.title,
+			description: item.description
+		}
+	}).success(function(data){
+		console.log('item successfully edited')
+	})
+};
+
+itemCtrl.deleteItem = function(item){
+	console.log(item.id)
+
+	for(var i=0; i < itemCtrl.itemList.length; i++){
+		if(itemCtrl.itemList[i].id === item.id){
+			console.log(i)
+			console.log(itemCtrl.itemList)
+			itemCtrl.itemList.splice(i, 1)
+			console.log(itemCtrl.itemList)
+		}
+	}
+	$http.delete('/posts/' + item.id, {authenticity_token:authenticity_token}).success(function(data){
+		console.log('Deleted!')
+	})
+};
+
 itemCtrl.getItems = function(){$http.get('/posts').success(function(data){
 		itemCtrl.itemList = data.posts;
 		console.log(itemCtrl.itemList);
